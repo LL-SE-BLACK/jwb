@@ -763,7 +763,7 @@ import os
 # get the file uploaded from user
 @csrf_exempt
 def upload_xlsx(request, c_id):
-    upload_dir = './upload/'
+    upload_dir = './IMS/static/img/upload/'
 
     # if really an upload
     if request.method == "POST":
