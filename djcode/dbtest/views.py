@@ -167,18 +167,20 @@ def class_info_query(c_id):
     :param c_id: Class id
     :return: list of student info, in form of {studentID, studentName}
     """
-    tmp_cla = Class_table.objects.filter(id=c_id)
+    tmp_cla = Class_table.objects.filter(Class=c_id)
     namelist = []
+    print tmp_cla
     for stu in tmp_cla:
-        s = TempTable.objects.filter(student_id=stu.student_id.id,
+
+        s = TempTable.objects.filter(student_id=stu.student.id,
                                      class_id=c_id).first()
         if s is None:
             score = None
         else:
             score = s.score
         tmp_node = {
-            'studentID': stu.student_id.id,
-            'studentName': stu.student_id.name,
+            'studentID': stu.student.id,
+            'studentName': stu.student.name,
             'score': score
         }
         namelist.append(tmp_node)
