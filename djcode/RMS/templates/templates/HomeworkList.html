@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Bootstrap</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'templates/bootstrap.min.css'%}">
+    <style>
+        body{
+            padding-top: 50px;
+        }
+        .start{
+            padding: 40px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="Head">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/" class="navbar-brand">Education Servise System</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#">Information</a></li>
+                <li><a href="#">Online Testing</a></li>
+                <li class = "active"><a href="Resource.html">Resource</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="container clearfix">
+    <div class="container-fluid">
+        <div class="col-xs-8 col-sm-3 sidebar-offcanvas">
+            <div class="pin-wrapper" style="height: 450px;">
+                <div class="pinned note-container" style="width: 248px;">
+                    <div class="transbox">
+                        {% if course_list %}
+                        <ul class="nav nav-list">
+                            <br>
+                            <br>
+                            {% for course in course_list %}
+                            {% if course.course_id == course_id %}
+                            <li><a href="ResourceCourse.html?course_id={{course.course.pk}}"><strong>{{course.course.name}}</strong></a></li>
+                            {% else %}
+                            <li><a href="ResourceCourse.html?course_id={{course.course.pk}}">{{course.course.name}}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            <br>
+                            <br>
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row row-offcanvas row-offcanvas-right">
+                <div class="col-xs-12 col-sm-9">
+
+                    <div class="transbox" id="HomeworkList">
+                        <h1>Homework</h1>
+                        {% if NewHomework and  request.COOKIES.type == 'student' %}
+                                    <h4>New homework is assigned</h4>
+                        {% endif %}
+                        <table class="table table-striped">
+
+                            <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Title</th>
+                                {% if request.COOKIES.type == 'student' %}
+                                <th>New</th>
+                                {% endif %}
+                                <th>StartTime</th>
+                                <th>Deadline</th>
+                                {% if request.COOKIES.type == 'student' %}
+                                <th>Upload</th>
+                                {% endif %}
+                                {% if request.COOKIES.type != 'student' %}
+                                <th>Delete</th>
+                                <th>Download</th>
+                                {% endif %}
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% if homework_list %}
+                            {% for homework in homework_list %}
+
+                            <tr>
+
+                                <td width="30">{{homework.pk}}</td>
+                                <td width="200"> <a href="Homework.html?homework_id={{homework.pk}}&course_id={{course_id}}">{{homework.title}}</a></td>
+                                {% if request.COOKIES.type == 'student' and homework.pk not in view_list%}
+                                <th>New!</th>
+                                {% else %}
+                                <th></th>
+                                {% endif %}
+                                <td width="200"> {{homework.start_date}}  </td>
+                                <td width="200"> {{homework.end_date}}  </td>
+                                {% if request.COOKIES.type == 'student' %}
+                                <td><a href="Homework.html?homework_id={{homework.pk}}&course_id={{course_id}}">upload</a></td>
+                                {% endif %}
+                                {% if request.COOKIES.type != 'student' %}
+                                <td><a href="delete_homework?homework_num={{homework.pk}}&course_id={{course_id}}">delete</a></td>
+                                <td><a href="DownloadHomework.html?homework_num={{homework.pk}}&course_id={{course_id}}">download</a> </td>
+                                {% endif %}
+                            </tr>
+
+                            {% endfor %}
+                            {% endif %}
+
+
+                            </tbody>
+                        </table>
+                        <!--<p><a href="HomeworkList.html" class="btn btn-primary btn-large">More Information »</a></p>-->
+                    </div>
+                </div><!--/col-xs-12 col-sm-9-->
+            </div><!--/row row-offcanvas-->
+        </div><!--/container-->
+        {% if request.COOKIES.type == 'teacher' %}
+        <p><a href="AssignHomework.html?course_id={{course_id}}" class="btn btn-primary btn-large">Assign Homework</a></p>
+        {% endif %}
+
+    </div>
+</section>
+
+</body>
+</html>
