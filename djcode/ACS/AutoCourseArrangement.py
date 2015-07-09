@@ -186,6 +186,7 @@ class AutoCourseArrange:
 					teacher = Faculty_user.objects.get(id = app.teacherID),
 					#time = self.transform_back(self.Schedule[app.id]['classTime']),
 					time = self.FitGroupThreeTime(self.transform_back(self.Schedule[app.id]['classTime'])),
+					classTime = self.transform_back(self.Schedule[app.id]['classTime']),
 					room = classroom.objects.get(id = self.Schedule[app.id]['classroom']).name,
 					capacity = app.class_capacity,
 					#term = app.term
@@ -194,7 +195,8 @@ class AutoCourseArrange:
 
 	def FitGroupThreeTime(self, time):
 		time_dict = {}
-		time = self.transform(json.loads(time))
+		print type(time)
+		time = json.loads(time)
 		for i in time:
 			if i[0] not in time_dict:
 				time_dict[i[0]] = {i[1]:1}

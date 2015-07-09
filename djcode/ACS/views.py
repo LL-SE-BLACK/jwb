@@ -93,7 +93,7 @@ def CourseApply(request, offset):
 	except StandardError, e:
 		f = 0;
 	for i in ApplyList:
-		i.classTime = timeadj(i.classTime, "application")#解码
+		i.classTime = timeadj(i.classTime)#解码
 		
 	if request.method == 'POST':
 		f = request.POST
@@ -187,7 +187,7 @@ def ClassroomInquiry(request):
 				print e
 			try:
 				for i in CourseList:
-					i.time = timeadj(i.time, "class_info")
+					i.time = timeadj(i.classTime)
 					print i.time
 			except StandardError, e:
 				print e
@@ -319,12 +319,9 @@ def dec_time(t):#课程时间
 	else:
 		return None
 
-def timeadj(t, mode):
+def timeadj(t):
 	#t = json.loads(t)
-	if mode=="application":
-		t = json.loads(t)
-	else:
-		t = TurnGroupThreeToUs(t)
+	t = json.loads(t)
 	tmp = ""
 	for i in t:
 		if i[0] == 1:
@@ -357,8 +354,8 @@ def ListToTable(CourseList):
 	for course in CourseList:
 		print(course.course.name)
 		print(course.room)
-		#t = json.loads(course.time)
-		t = TurnGroupThreeToUs(course.time)
+		t = json.loads(course.classTime)
+		#t = TurnGroupThreeToUs(course.time)
 		#print(t)
 		for ct in t:
 			#print(ct)
@@ -379,11 +376,3 @@ def auth_admin(request):
 		return True
 	else:
 		return False
-
-def TurnGroupThreeToUs(time):
-	ret = []
-	for i in time.split("|"):
-		for j in i[2:]:
-			ret.append([int(i[0]), int(j)])
-	print ret
-	return ret

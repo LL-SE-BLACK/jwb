@@ -137,6 +137,7 @@ class Class_info(models.Model):
     course = models.ForeignKey(Course_info, related_name='class_course')
     teacher = models.ForeignKey(Faculty_user)
     time = models.CharField(max_length=20) #by CCS: type integer to char
+    classTime = models.TextField(default="[]")
     room = models.CharField(max_length=20)
     examdate = models.CharField(max_length=10, default="0000000000")
     examtime = models.CharField(max_length=10, default="0000000000")
