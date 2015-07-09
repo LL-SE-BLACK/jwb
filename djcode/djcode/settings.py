@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'classChoose',
     'teacher', #OnlineTest
     'student', #OnlineTest
+    'RMS',
 )
 
 MIDDLEWARE_CLASSES = (

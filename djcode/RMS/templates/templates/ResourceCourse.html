@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Bootstrap</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'templates/bootstrap.min.css'%}">
+    <style>
+        body{
+            padding-top: 50px;
+        }
+        .start{
+            padding: 40px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="Head">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/" class="navbar-brand">Education Servise System</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#">Information</a></li>
+                <li><a href="#">Online Testing</a></li>
+                <li class = "active"><a href="Resource.html">Resource</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="container clearfix">
+    <div class="container-fluid">
+        <div class="col-xs-8 col-sm-3 sidebar-offcanvas">
+
+            <div class="pin-wrapper" style="height: 450px;">
+                <div class="pinned note-container" style="width: 248px;">
+                <div class="transbox">
+                    {% if course_list %}
+                    <ul class="nav nav-list">
+                        <br>
+                        <br>
+                        {% for course in course_list %}
+                            {% if course.course_id == course_id %}
+                            <li><a href="ResourceCourse.html?course_id={{course.course.pk}}"><strong>{{course.course.name}}</strong></a></li>
+                            {% else %}
+                            <li><a href="ResourceCourse.html?course_id={{course.course.pk}}">{{course.course.name}}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        <br>
+                        <br>
+                    </ul>
+                    {% endif %}
+                </div>
+                </div>
+            </div>
+        </div>
+
+                <div class="container" id="CourseRecource">
+                    <div class="row row-offcanvas row-offcanvas-right">
+                        <div class="col-xs-12 col-sm-9">
+
+                            <div class="transbox" id="HotNotice">
+                                <div>
+                                    <h1>Notification</h1>
+
+                                    <table class="table table-striped">
+
+                                        <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Content</th>
+                                            <th>Date</th>
+                                        </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                        {% if Notice_list %}
+
+                                        {% for notice in Notice_list %}
+                                            <tr>
+                                                <td width="30">{{notice.notice_num}}</td>
+                                                <td width="600"><a href="Notice.html?course_id={{course_id}}&notice_id={{notice.notice_num}}">{{notice.notice_title}}</a></td>
+                                                <td width="200">{{notice.date}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        {% endif %}
+                                        </tbody>
+
+                                    </table>
+
+                                    <p><a href="NoticeList.html?course_id={{course_id}}" class="btn btn-primary btn-large">More Information »</a></p>
+
+                                </div>
+                            </div>
+
+                            <div class="transbox" id="RecentHomework">
+                                <h1>Homework</h1>
+                                {% if NewHomework and request.COOKIES.type == 'student' %}
+                                    <h4>New homework is assigned</h4>
+                                {% endif %}
+                                <table class="table table-striped">
+
+                                    <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>New</th>
+                                        <th>Title</th>
+                                        <th>Deadline</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if homework_list %}
+                                    {% for homework in homework_list %}
+
+
+                                    <tr>
+                                        <td width="30">{{homework.pk}}</td>
+                                        {% if request.COOKIES.type == 'student' and homework.pk not in view_list%}
+                                        <td>New!</td>
+                                        {% else %}
+                                        <td></td>
+                                        {% endif %}
+                                        <td width="300"> <a href="Homework.html?homework_id={{homework.pk}}&course_id={{course_id}}">{{homework.title}}</a></td>
+                                        <td width="200">{{homework.end_date}}</td>
+                                    </tr>
+
+
+                                    {% endfor %}
+                                    {% endif %}
+
+                                    </tbody>
+                                </table>
+                                <p><a href="HomeworkList.html?course_id={{course_id}}" class="btn btn-primary btn-large">More Information »</a></p>
+                            </div>
+
+                            <div class="transbox" id="ResourceList">
+                                <h1>Resourse</h1>
+                                <table class="table table-striped">
+
+                                    <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Filename</th>
+                                        <th>Date</th>
+                                        <th>Download</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                    {% if resource_list %}
+                                    {% for resource in resource_list %}
+                                    <tr>
+                                        <td width="30">{{resource.pk}}</td>
+                                        <td width="400">{{resource.resource_name}}</td>
+                                        <td width="200">{{resource.date}}</td>
+                                        <td width="200"><a href="file_download?address={{resource.resource_add}}">download</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+
+                                    </tbody>
+                                </table>
+                                <p><a href="ResourceList.html?course_id={{course_id}}" class="btn btn-primary btn-large">More Information »</a></p>
+                            </div>
+
+                        </div><!--/col-xs-12 col-sm-9-->
+                    </div><!--/row row-offcanvas-->
+                </div><!--/container-->
+
+    </div>
+</section>
+</body>
+</html>

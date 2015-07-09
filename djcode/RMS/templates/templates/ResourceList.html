@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Bootstrap</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'templates/bootstrap.min.css'%}">
+    <style>
+        body{
+            padding-top: 50px;
+        }
+        .start{
+            padding: 40px 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="Head">
+    <div class="container">
+        <div class="navbar-header">
+            <a href="/" class="navbar-brand">Education Servise System</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#">Information</a></li>
+                <li><a href="#">Online Testing</a></li>
+                <li class = "active"><a href="Resource.html">Resource</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+
+
+<section class="container clearfix">
+    <div class="container-fluid">
+
+        <div class="col-xs-8 col-sm-3 sidebar-offcanvas">
+            <div class="pin-wrapper" style="height: 450px;">
+                <div class="pinned note-container" style="width: 248px;">
+                    <div class="transbox">
+                        {% if course_list %}
+                        <ul class="nav nav-list">
+                            <br>
+                            <br>
+                            {% for course in course_list %}
+                            {% if course.course_id == course_id %}
+                            <li><a href="ResourceCourse.html?course_id={{course.course.pk}}"><strong>{{course.course.name}}</strong></a></li>
+                            {% else %}
+                            <li><a href="ResourceCourse.html?course_id={{course.course.pk}}">{{course.course.name}}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            <br>
+                            <br>
+                        </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+
+            <div class="container" id="UploadResource">
+            <form class="navbar-form navbar-left" action="Resource_Upload?course_id={{course_id}}" method="post" enctype="multipart/form-data">
+                <legend>Upload Resource</legend>
+                <!--<label for="file">ADD RESOURCE:</label>-->
+                {% csrf_token %}
+                <input type="file" name="file" id="file">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="input your resourse&#39;s title" style="width:250px" name="text">
+                    <input type="submit" class="btn btn-default" name="submit" value="Submit">
+                </div>
+            </form>
+        </div>
+
+
+            <div class="container" id="FindingResource">
+            <!--<div class="row">-->
+                <!--<div class="span12">-->
+                    <legend>Search Resource</legend>
+                    <form action="search_resource?course_id={{course_id}}" method="post" align="center">
+
+                            <div class="col-xs-8">
+                                <input type="text" class="form-control" placeholder="search resource" name="title" value={{title}}> </div>
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-default" name="order" value="">Search</button>
+                                <button type="submit" class="btn btn-default" name="order" value="time">Order by Time</button>
+                                <button type="submit" class="btn btn-default" name="order" value="frequency">Order by Frequency</button>
+                            </div>
+
+                    </form>
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+
+            <div class="container" id="ResourceList">
+                <legend>Resource List</legend>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Hot</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Frequence</th>
+                        <th>Download</th>
+                        {% if request.COOKIES.type != 'student' %}
+                        <td>Delete</td>
+                        <td>Stick</td>
+                        <td>Stick Off</td>
+                        {% endif %}
+                    </tr>
+                    </thead>
+                <tbody>
+                {% if result_list %}
+                {% for resource in result_list %}
+                <tr>
+                    <td width="30">{{resource.pk}}</td>
+                    {% if resource.resource_top == '1'  %}
+                    <td> HOT! </td>
+                    {% else %}
+                    <td> ... </td>
+                    {% endif %}
+                    <td width="400">{{resource.resource_name}}</td>
+                    <td width="100">{{resource.date}}</td>
+                    <td width="100">{{resource.frequency}}</td>
+                    <td><a href="file_download?type=1&resource_id={{resource.pk}}&address={{resource.resource_add}}">download</a></td>
+                    {% if request.COOKIES.type != 'student' %}
+                    <td><a href="delete_resource?resource_id={{resource.pk}}&course_id={{course_id}}&title={{title}}">delete</a></td>
+                    <td><a href="stick_resource?resource_id={{resource.pk}}&course_id={{course_id}}&title={{title}}">stick</a></td>
+                    <td><a href="cancal_stick_resource?resource_id={{resource.pk}}&course_id={{course_id}}&title={{title}}">stick off</a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% else %}
+                    {% if resource_list %}
+                    {% for resource in resource_list %}
+                    <tr>
+                        <td width="30">{{resource.pk}}</td>
+                        {% if resource.resource_top == '1'  %}
+                            <td> HOT! </td>
+                        {% else %}
+                            <td> ... </td>
+                        {% endif %}
+                        <td width="600">{{resource.resource_name}}</td>
+                        <td width="200">{{resource.date}}</td>
+                        <td width="100">{{resource.frequency}}</td>
+                        <td><a href="file_download?type=1&resource_id={{resource.pk}}&address={{resource.resource_add}}">download</a></td>
+                        {% if request.COOKIES.type != 'student' %}
+                        <td><a href="delete_resource?resource_id={{resource.pk}}&course_id={{course_id}}&title={{title}}">delete</a></td>
+                        <td><a href="stick_resource?resource_id={{resource.pk}}&course_id={{course_id}}&title={{title}}">stick</a></td>
+                        <td><a href="cancal_stick_resource?resource_id={{resource.pk}}&course_id={{course_id}}&title={{title}}">stick off</a></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                {% endif %}
+                </tbody></table>
+        </div>
+        </div>
+
+    </div>
+</section>
+</body>
+</html>
