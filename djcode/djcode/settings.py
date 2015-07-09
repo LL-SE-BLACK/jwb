@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'IMS',
     'dbtest',
     'classChoose',
+    'ACS',
     #'teacher',
     #'student',
 )
@@ -65,6 +66,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
                  os.path.join(os.path.dirname(__file__), '../teacher/template').replace('\\','/'),
                  os.path.join(os.path.dirname(__file__), '../templates').replace('\\','/'),
+                 os.path.join(os.path.dirname(__file__), '../ACS/templates').replace('\\','/'),
                  ],
         'APP_DIRS': True,
         'OPTIONS': {

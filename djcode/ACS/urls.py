@@ -26,10 +26,11 @@ urlpatterns = [
 	url(r'^cr/(add|del|mod|)?$', views.TeachingResourse),
 	url(r'^acs/(automatic)?$', views.CourseArrange),
 	url(r'^mca/(add_cl|del_cl|)?$', views.CourseApply),
-	url(r'^(admin|teacher)?$', views.Index),
+	#url(r'^(admin|teacher)?$', views.Index),
 	url(r'^tcs/', views.CourseSearch),
 	url(r'^ci/', views.ClassroomInquiry),
 	url(r'^course/(add_cz|del_cz|add_cl|del_cl|)?$', views.CourseOperation),
-	url(r'^logout/', views.Logout),
+	url(r'^logout/$', views.Logout),
+	url(r'^$', views.Index),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
  

@@ -120,6 +120,8 @@ class AutoCourseArrange:
 	def ApplicationFitClassroom(self, application, classroom):
 		if application.campus!=None and application.campus!=classroom.campus:
 			return False
+		if application.class_capacity>classroom.capacity:
+			return False
 		return True
 
 	def FitTime_classroom(self, timeList, classroom):
@@ -164,7 +166,7 @@ class AutoCourseArrange:
 		which is easy to deal with.
 		"""
 		mapping = {
-			1:[1, 2], 2:[3,4,5], 3:[6,7,8], 4:[9, 10], 5:[11,12,13],	# morning 
+			1:[1, 2], 2:[3,4], 3:[7,8], 4:[9, 10], 5:[11, 12],	# morning 
 		}
 		ret = []
 		for i in class_time:
@@ -179,11 +181,29 @@ class AutoCourseArrange:
 		for app in self.application:
 			if app.id in self.Schedule:
 				newClass = Class_info.objects.create(
-					course_id = app.cuz_ID,
-					teacher = app.teacherID,
-					classTime = self.transform_back(self.Schedule[app.id]['classTime']),
-					classroom = self.Schedule[app.id]['classroom'],
-					capacity = app.class_capacity
+					id = app.id,
+					course = Course_info.objects.get(id = app.cuz_ID),
+					teacher = Faculty_user.objects.get(id = app.teacherID),
+					#time = self.transform_back(self.Schedule[app.id]['classTime']),
+					time = self.FitGroupThreeTime(self.transform_back(self.Schedule[app.id]['classTime'])),
+					room = classroom.objects.get(id = self.Schedule[app.id]['classroom']).name,
+					capacity = app.class_capacity,
 					#term = app.term
 					)
 				newClass.save()
+
+	def FitGroupThreeTime(self, time):
+		time_dict = {}
+		time = self.transform(json.loads(time))
+		for i in time:
+			if i[0] not in time_dict:
+				time_dict[i[0]] = {i[1]:1}
+			else:
+				time_dict[i[0]][i[1]] = 1
+		ret = ""
+		for i in time_dict:
+			ret = ret + "|" + str(i) + "0"
+			for j in time_dict[i]:
+				ret = ret + str(j)
+		ret = ret[1:]
+		return ret

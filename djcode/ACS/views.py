@@ -10,11 +10,12 @@ from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from models import Application as apply
 from models import classroom
-from IMS.models import Course_info, Class_info
+from IMS.models import Course_info, Class_info, Faculty_user
 from django.contrib.auth.models import User
 from django.contrib import auth
 from AutoCourseArrangement import AutoCourseArrange
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required, permission_required
 import json
 
 @csrf_exempt
@@ -24,20 +25,21 @@ def Logout(request):
 
 @csrf_exempt
 def TeachingResourse(request, offset):#管理教室
-	#if not request.user.is_staff:
-	#	return HttpResponseRedirect('../mca')#非法url
+	if not auth_admin(request):
+		return HttpResponseRedirect('../mca')#非法url
 	
 	del_r = ''
 	add_r = ''
 	mod_r = ''
 	
-	admin = request.user.is_staff
+	admin = auth_admin(request)
 	if request.method == 'POST':
 		f = request.POST
 	else:
 		f = 0
 	if f:
 		if offset == "add" :#插入
+			
 			try:
 				try:
 					p = classroom.objects.create( name = f["cr_Name"], type = f["cr_Type"], capacity = f["cr_capa"], campus = f["cr_camp"])
@@ -67,10 +69,10 @@ def TeachingResourse(request, offset):#管理教室
 
 @csrf_exempt
 def CourseArrange(request, offset):
-	if not request.user.is_staff:
+	if not auth_admin(request):
 		return render_to_response('mca.html')
 	res = ''
-	admin = request.user.is_staff
+	admin = auth_admin(request)
 	if offset == 'automatic':#按下按钮开始调课
 		res = 'Done'
 		auto = AutoCourseArrange()
@@ -84,14 +86,14 @@ def CourseApply(request, offset):
 	del_r = ''
 	add_r = ''
 	
-	admin = request.user.is_staff
+	admin = auth_admin(request)
 	try:
 		ApplyList = apply.objects.filter(teacherID=request.user.username)#获得教师的课程表信息
 		print ApplyList
 	except StandardError, e:
 		f = 0;
 	for i in ApplyList:
-		i.classTime = timeadj(i.classTime)#解码
+		i.classTime = timeadj(i.classTime, "application")#解码
 		
 	if request.method == 'POST':
 		f = request.POST
@@ -142,30 +144,27 @@ def CourseApply(request, offset):
 	return render_to_response('mca.html', {'admin': admin, 'add_result':add_r, 'del_result':del_r, 'applylist':ApplyList})
 
 @csrf_exempt
-def Index(request, offset):#登录部分
-	if offset == 'teacher':
-		#user = auth.authenticate(username='t', password='')
-		#u = 'mca.html'
-		print "teacher"
-		u = '/ACS/mca/'
-		#auth.login(request, user)
-		#admin = request.user.is_staff
-		admin = 0
+def Index(request):#登录部分
+	if request.user.is_anonymous():
+		u = '/'
 		return HttpResponseRedirect(u)
-	elif offset == 'admin':
-		#user = auth.authenticate(username='a', password='')
-		#u = 'cr.html'
-		print "admin"
+	username = request.user.username
+	groups = request.user.groups.values_list('name', flat=True)
+	if len(groups) > 0:
+		Type = groups[0]
+	else:
+		Type = 'admin'
+	#assert False
+	if Type == 'teacher':
+		u = '/ACS/mca/'
+		return HttpResponseRedirect(u)
+	elif  Type == 'admin':
 		u = '/ACS/cr/'
-		#auth.login(request, user)
-		#admin = request.user.is_staff
-		admin = 1
 		return HttpResponseRedirect(u)
 	else:
-		#user = None
-		u = 'ACS_main.html'
-		print "enter main.html"
-		return render_to_response('ACS_main.html')
+		u = '/'
+		return HttpResponseRedirect(u)
+	
 	
 @csrf_exempt
 def CourseSearch(request):#课程查询
@@ -174,6 +173,7 @@ def CourseSearch(request):#课程查询
 		CourseTable = ListToTable(CourseList)
 	except StandardError, e:
 		CourseTable = ""
+		print e
 	return render_to_response('tcs.html', {'schedule':CourseTable, 'admin':request.user.is_staff})
 
 @csrf_exempt
@@ -182,32 +182,37 @@ def ClassroomInquiry(request):
 		try:
 			print "classroom:", request.POST["classroom_id"]
 			try:
-				CourseList = Class_info.objects.filter(room=request.POST["classroom_id"])
+				CourseList = Class_info.objects.filter(room = request.POST["classroom_id"])
 			except StandardError, e:
 				print e
-			print CourseList
-			for i in CourseList:
-				i.classTime = timeadj(i.classTime)
+			try:
+				for i in CourseList:
+					i.time = timeadj(i.time, "class_info")
+					print i.time
+			except StandardError, e:
+				print e
 		except StandardError, e:
-			CourseList = ''
+			print e
+			CourseList = None
 	else:
-		CourseList = ''
+		CourseList = None
 	#assert False
-	return render_to_response('ci.html', {'roomschedule':CourseList, 'admin':request.user.is_staff})
+	return render_to_response('ci.html', {'roomschedule':CourseList, 'admin':auth_admin(request)})
 
 @csrf_exempt
 def CourseOperation(request, offset):
-	if not request.user.is_staff:
+	if not auth_admin(request):
 		return HttpResponseRedirect('../mca')
 	del_r = ''
 	add_r = ''
 	del_2 = ''
 	add_2 = True
-	admin = request.user.is_staff
+	admin = auth_admin(request)
 	if request.method == 'POST':
 		f = request.POST
 	else:
 		f = 0
+	
 	if offset == 'add_cz':#增加课程
 		try:
 			p = Course_info.objects.create(id = f["cz_ID"], 
@@ -236,6 +241,7 @@ def CourseOperation(request, offset):
 		t2 = f["cl_Hour2"]
 		#时间处理
 		t1 = dec_time(int(t1))
+		
 		r = []
 		for i in t1:
 			r.append([int(w1), i])
@@ -251,27 +257,38 @@ def CourseOperation(request, offset):
 		#检查同一老师同一时间
 		a = Class_info.objects.filter(teacher = f["teac_ID"], time = t)#
 		teachertime = a and 1 or 0
+		print "same teacher same time", a
 		#检查相同教室相同时间
 		a = Class_info.objects.filter(room = f["cl_room"], time = t)
 		roomtime = a and 1 or 0
 		a = classroom.objects.filter(name = f["cl_room"])
-		over = a[0].capacity
+		print "same classroom same time", a
+		#over = a[0].capacity
 		#检查容量
-		if((not a) or a[0].capacity < f["cl_Capa"] or f["cl_Capa"] < 0):
+		if (not a) or (a[0].capacity < int(f["cl_Capa"])) or (int(f["cl_Capa"]) < 0):
 			add_2 = False
+			print not a
+			print a[0].capacity < int(f["cl_Capa"])
+			print int(f["cl_Capa"]) < 0
+			print "capacity"
 		elif 	(teachertime  + roomtime  >= 1):
 			add_2 = False
+			print "either"
 		else:
 			try:
-				p = Class_info.objects.create(course = f["cuz_ID"], 
-											teacher = f["teac_ID"],
+				p = Class_info.objects.create(
+											id = f["cl_ID"],
+											course = Course_info.objects.get(id = f["cuz_ID"]), 
+											teacher = Faculty_user.objects.get(id = f["teac_ID"]),
 											time = t,
 											room = f["cl_room"], 
-											capacity = f["cl_Capa"])
+											capacity = int(f["cl_Capa"])
+											)
 				p.save()
 				add_2 = True			
 			except StandardError, e:
 				add_2 = False
+				print e
 	elif offset == 'del_cl':
 		try:
 			p = Class_info.objects.get(id = f["cl_ID"])
@@ -302,8 +319,12 @@ def dec_time(t):#课程时间
 	else:
 		return None
 
-def timeadj(t):
-	t = json.loads(t)
+def timeadj(t, mode):
+	#t = json.loads(t)
+	if mode=="application":
+		t = json.loads(t)
+	else:
+		t = TurnGroupThreeToUs(t)
 	tmp = ""
 	for i in t:
 		if i[0] == 1:
@@ -334,12 +355,35 @@ def ListToTable(CourseList):
 		table.append(row)
 	ckt = [0,0,1,1,1,2,2,2,3,3,4,4,4]
 	for course in CourseList:
-		print(course.course_id)
-		print(course.classroom)
-		t = json.loads(course.classTime)
+		print(course.course.name)
+		print(course.room)
+		#t = json.loads(course.time)
+		t = TurnGroupThreeToUs(course.time)
 		#print(t)
 		for ct in t:
 			#print(ct)
 			table[ckt[ct[1] - 1]][ct[0] - 1] = course
 	#print(table)
+	print table
 	return table
+
+@login_required
+def auth_admin(request):
+	username = request.user.username
+	groups = request.user.groups.values_list('name', flat=True)
+	if len(groups) > 0:
+		Type = groups[0]
+	else:
+		Type = 'admin'
+	if Type == 'admin':
+		return True
+	else:
+		return False
+
+def TurnGroupThreeToUs(time):
+	ret = []
+	for i in time.split("|"):
+		for j in i[2:]:
+			ret.append([int(i[0]), int(j)])
+	print ret
+	return ret

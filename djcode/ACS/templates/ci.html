@@ -32,9 +32,9 @@
                       {%for class in roomschedule%}
                       <tr>
                        <td>{{class.course_id}}</td>
-                       <td>{{class.teacher}}</td>
-                       <td>{{class.classTime}}</td>
-                       <td>{{class.classroom}}</td>
+                       <td>{{class.teacher.name}}</td>
+                       <td>{{class.time}}</td>
+                       <td>{{class.room}}</td>
                        <td>{{class.capacity}}</td>
                      </tr>
                      {% endfor %}
