@@ -194,7 +194,7 @@ class AutoCourseArrange:
 
 	def FitGroupThreeTime(self, time):
 		time_dict = {}
-		time = self.transform(json.loads(time))
+		time = json.loads(time)
 		for i in time:
 			if i[0] not in time_dict:
 				time_dict[i[0]] = {i[1]:1}

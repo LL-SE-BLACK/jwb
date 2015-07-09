@@ -402,7 +402,7 @@ def b_score_modification(c_id, s_id, score, reason):
     # from_fac = Faculty_user.objects.filter(name=cla.teacher).first()
     from_fac = cla.teacher
     s = ScoreTable.objects.filter(class_id=c_id, student_id=s_id).first()
-    print('new score {}'.format(s.score))
+    print('old score {}'.format(s.score))
     print(s.class_id)
     # print(s.student_id)
     old_score = s.score
@@ -424,10 +424,10 @@ def b_score_modification(c_id, s_id, score, reason):
     top_msg_id += 1
     print('new msg id {}'.format(top_msg_id))
 
-    teacher_of_course = Class_info.objects.filter(id=cla.id)
+    teacher_of_course = Class_info.objects.filter(course=cla.course)
     print('teacher of the course {} is {}'.format(cla.id, len(teacher_of_course)))
 
-    if count_faculty_of_course(cla.id) == 1:
+    if count_faculty_of_course(cla.course) == 1:
         # TODO: no verified
         # get this score and update and save it
         score_row = ScoreTable.objects.get(class_id=c_id, student_id=s_id)
@@ -443,9 +443,9 @@ def b_score_modification(c_id, s_id, score, reason):
                                                      reason=reason, status=2)
         # print(update_message)
         return
-
+    print teacher_of_course
     for info in teacher_of_course:
-        to_fac = Faculty_user.objects.filter(name=info.teacher).first()
+        to_fac = Faculty_user.objects.filter(id=info.teacher.id).first()
         #
         if to_fac.id == from_fac.id:
             continue
@@ -468,7 +468,11 @@ def db_query_modify_info(faculty_id):
     """
 
     modify_list = MessageTable.objects.filter(from_faculty_id=faculty_id)
+    print 'look4modify'
+    print modify_list
     audit_list = MessageTable.objects.filter(to_faculty_id=faculty_id)
+    print 'look4audit'
+    print audit_list
     ret = []
     modify_node = []
     audit_node = []
@@ -489,7 +493,7 @@ def db_query_modify_info(faculty_id):
             tmp_status = 'pending'
         temp_node = {  # generate node
                        'messageID': rec.message_id,
-                       'className': rec.class_id.id.name,
+                       'className': rec.class_id.course.name,
                        'studentID': rec.student_id.id,
                        'studentName': rec.student_id.name,
                        'old_score': rec.old_score,
@@ -513,7 +517,7 @@ def db_query_modify_info(faculty_id):
             tmp_status = 'final_reject'
         temp_node = {
             'messageID': rec.message_id,
-            'className': rec.class_id.id.name,
+            'className': rec.class_id.course.name,
             'studentID': rec.student_id.id,
             'studentName': rec.student_id.name,
             'old_score': rec.old_score,
@@ -523,7 +527,9 @@ def db_query_modify_info(faculty_id):
         }
         audit_node.append(temp_node)
     ret.append(audit_node)
+    print 1111
     print(ret)
+    print 1111
     return ret
 
 
@@ -584,8 +590,8 @@ def b_sanction(request, msg_id, status):
         return render_to_response('score_alert.html', {'alert_info': u'非法记录号', 'refresh_url': '/SM/modification'})
 
 
-def count_faculty_of_course(id):
-    return len(Class_info.objects.filter(id=id))
+def count_faculty_of_course(course):
+    return len(Class_info.objects.filter(course=course))
 
 
 def check_msg_status(message_id):
@@ -757,7 +763,7 @@ import os
 # get the file uploaded from user
 @csrf_exempt
 def upload_xlsx(request, c_id):
-    upload_dir = './upload/'
+    upload_dir = './IMS/static/img/upload/'
 
     # if really an upload
     if request.method == "POST":

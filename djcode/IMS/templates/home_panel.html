@@ -16,9 +16,9 @@
             <ul class="nav nav-tabs navbar-left">
                 <li role="presentation" class="active"><a href="#">个人首页</a></li>
                 {% if isStudent %}
-                    <li role="presentation"><a href="#">查看个人课表</a></li>
+                    <li role="presentation"><a href="/show_class/?xh={{ usrInfo.id }}">查看个人课表</a></li>
                 {% elif isFaculty %}
-                    <li role="presentation"><a href="#">查看开课情况</a></li>
+                    <li role="presentation"><a href="/ACS/tcs/">查看开课情况</a></li>
                 {% elif isAdmin %}
                     <li role="presentation"><a href="/ims/course/">课程信息管理</a></li>
                     <li role="presentation"><a href="/ims/user/">用户信息管理</a></li>
@@ -47,7 +47,8 @@
             </ul>
         </div>
     </nav>
-
+<div class="alert" style="width: 50%;" >
+<h3>
     {% if isStudent %}
         Weclome, {{ usrInfo.id }}同学!
     {% endif %}
@@ -59,6 +60,8 @@
         Weclome, {{ usrInfo.id }}管理员!
         <!--  TODO 用户管理的权限限定 -->
     {% endif %}
+</h3>
+</div>
 
 </div>
 
