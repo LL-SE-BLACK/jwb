@@ -30,7 +30,6 @@ def parse_xlsx(xlsx_filename):
     ws = wb.active
 
     xlsx_info = XlsxInfo()
-
     # check whether the syntax remains the same from demo.xlsx
     if ws['A5'].value == '学号':
         # and str(ws['A6'].value).startswith('31')
