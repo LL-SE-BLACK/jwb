@@ -128,8 +128,6 @@ def b_student_query(request):
     scores = []
     ret = ScoreTable.objects.filter(student_id=student_id)
 
-    #print(len(ret))
-
     for stu in ret:
         tmp_score = stu.score
         tmp_class = stu.class_id
@@ -139,13 +137,15 @@ def b_student_query(request):
             tmp_gpa = (tmp_score - 60) / 10 + 1.5
             if tmp_gpa > 5:
                 tmp_gpa = 5
-        tmp_node = {'courseID': tmp_class.id.id,
-                    'courseName': tmp_class.id.name,
-                    'credit': tmp_class.id.credits,
-                    'semester': tmp_class.id.semester,
+
+        tmp_node = {'courseID': tmp_class.course.id,
+                    'courseName': tmp_class.course.name,
+                    'credit': tmp_class.course.credits,
+                    'semester': tmp_class.semester,
                     'score': tmp_score,
                     'gradePoint': tmp_gpa
                     }
+        print(tmp_node)
         scores.append(tmp_node)
     print(scores)
     return HttpResponse(json.dumps(scores), content_type="application/json")

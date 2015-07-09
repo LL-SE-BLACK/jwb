@@ -49,6 +49,9 @@ class ScoreTable(models.Model):
     class Meta:
         ordering = ["class_id"]
 
+    def __unicode__(self):
+        return u'class_id:%s, student_id:%s, score:%f'%(self.class_id, self.student_id, self.score)
+
     def __str__(self):
         return 'score of student %s in class %s' \
                % (self.student_id, self.class_id)
