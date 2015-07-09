@@ -30,21 +30,20 @@ def parse_xlsx(xlsx_filename):
     ws = wb.active
 
     xlsx_info = XlsxInfo()
-
     # check whether the syntax remains the same from demo.xlsx
-    if ws['A5'].value == '学号':
+#    if ws['A5'].value == '学号':
         # and str(ws['A6'].value).startswith('31')
-        if ws['F3'].value is not None:
-            class_id = ws['F3'].value
-        else:
-            xlsx_info.error_str = '[格式错误] 课程编号未填写!'
-            xlsx_info.error_code = 3
-            return xlsx_info
-        print('ok!')
+    if ws['F3'].value is not None:
+        class_id = ws['F3'].value
     else:
-        xlsx_info.error_str = '[格式错误] 未知格式错误，您可能更改了模板xlsx文件的文本格式!'
+        xlsx_info.error_str = '[格式错误] 课程编号未填写!'
         xlsx_info.error_code = 3
         return xlsx_info
+    print('ok!')
+    # else:
+    #     xlsx_info.error_str = '[格式错误] 未知格式错误，您可能更改了模板xlsx文件的文本格式!'
+    #     xlsx_info.error_code = 3
+    #     return xlsx_info
 
     # the default start row for score information
     start_row = DEFAULT_SCORE_START_ROW

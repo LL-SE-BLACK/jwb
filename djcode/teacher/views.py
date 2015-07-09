@@ -810,7 +810,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '06188210',
+                                CourseId = '04120190s',
                                 Score = score,
             )
     for i  in range(20):
@@ -837,7 +837,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '06188210',
+                                CourseId = '04120190',
                                 Score = score,
             )
     for i  in range(20):
@@ -864,7 +864,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '06188210',
+                                CourseId = '04120190',
                                 Score = score,
             )
     for i  in range(20):
@@ -883,7 +883,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '06188210',
+                                CourseId = '04120190',
                                 Score = score,
             )
     for i  in range(20):
@@ -903,7 +903,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '06188210',
+                                CourseId = '04120190',
                                 Score = score,
             )
     return HttpResponse('why should i return ?')
