@@ -24,9 +24,9 @@ stu2 = Student_user.objects.get(id='3120366069')
 stu3 = Student_user.objects.get(id='3120615710')
 stu4 = Student_user.objects.get(id='3120817468')
 
-fac1 = Faculty_user.objects.get(id='222222')
-fac2 = Faculty_user.objects.get(id='222223')
-fac3 = Faculty_user.objects.get(id='222224')
+fac1 = Faculty_user.objects.get(id='000001')
+fac2 = Faculty_user.objects.get(id='000002')
+fac3 = Faculty_user.objects.get(id='000003')
 
 cour1 = Course_info.objects.get(id='06188210')
 cour2 = Course_info.objects.get(id='04122600')
