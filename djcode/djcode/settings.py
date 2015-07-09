@@ -65,6 +65,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
                  os.path.join(os.path.dirname(__file__), '../teacher/template').replace('\\','/'),
+                 os.path.join(os.path.dirname(__file__), '../RMS/templates').replace('\\','/'),
                  os.path.join(os.path.dirname(__file__), '../templates').replace('\\','/'),
                  ],
         'APP_DIRS': True,

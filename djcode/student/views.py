@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
@@ -27,21 +25,42 @@ def get_class(request):
     UserClass = MyAuth.objects.get(UserId=UserId)
     return UserClass.OnAuthClassId
 
-
+@login_required
 def ViewClass(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+
+    print Type
     if request.method == 'GET':
-        StudentId= request.user.username
-        ClassTable = Class_table.objects.filter(student_id__id=StudentId)
+        if Type == 'student':
+            StudentId= request.user.username
+            ClassTable = Class_table.objects.filter(student_id__id=StudentId)
+        elif Type == 'teacher':
+            TeacherId = request.user.username
+            ClassTable = Class_info.objects.filter(teacher__id=TeacherId)
+        else:
+            return HttpResponse('<html><title></title><body></body></html>',)
         if not ClassTable:
-            return HttpResponse('<html><title></title><body>没课啦哈哈哈</body></html>',)
+            return HttpResponse('<html><title></title><body></body></html>',)
         ClassList = []
+        print Type
         for ClassName in ClassTable:
-            ClassId = ClassName.Class.id
-            CourseName = ClassName.Class.course.name
+            if Type == 'student':
+                ClassId = ClassName.Class.id
+                CourseName = ClassName.Class.course.name
+            elif Type == 'teacher':
+                print 'here'
+                ClassId = ClassName.id
+                CourseName = ClassName.course.name
+            else:
+                print 'Not a valid user'
             ClassList.append({'Name': CourseName+' '+ClassId,'URL':'/class_list/'+ClassId+'/'})
         return render_to_response('Choose_Class.html',{'ClassList':ClassList},context_instance=RequestContext(request))
+
     if request.method =='POST':
         try:
             user_class = MyAuth.objects.get(UserId=request.user.username)
@@ -50,14 +69,22 @@ def ViewClass(request,offset):
         except MyAuth.DoesNotExist:
             user_class = MyAuth.objects.create(UserId=request.user.username,  OnAuthClassId=offset)
 
-        if len(offset) == 10:
+        if Type == 'student':
             return HttpResponseRedirect('/student/ViewPaper/')
-        else :
+        else:
             return HttpResponseRedirect('/teacher/AddQuestion/')
 # view all paper has been published
+@login_required
 def ViewPaper(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'student':
+        raise Http404()
+
     if request.method =='GET':
         pagename = 'Online test'
         ClassID = get_class(request)
@@ -76,6 +103,7 @@ def ViewPaper(request):
         return render_to_response('P_viewlist_stu.html',locals(),context_instance=RequestContext(request))
 
 # used to generate question list of a paper
+
 def getquestion(QuesId):
     QuestionIdList = []
     for i in range(20):
@@ -83,9 +111,17 @@ def getquestion(QuesId):
         QuestionIdList.append(Question.objects.get(QuestionId=mid))
     return  QuestionIdList
 #Generate a online test page
+@login_required
 def OnlinePaper(request, offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'student':
+        raise Http404()
+
     if request.method == 'POST':
         try:
             Qid = Paper.objects.get(PaperId = offset)
@@ -104,9 +140,17 @@ def OnlinePaper(request, offset):
         URL = '/student/test/score/'+request.user.username+offset+'/'
         return render_to_response('OnlineTest.html',{'QuestionList':QuestionIdList,'URL':URL,'pagename':'Online Test'},context_instance=RequestContext(request))
 #compute socre of student
+@login_required
 def ReturnScore(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'student':
+        raise Http404()
+
     if request.method =='POST':
         form = request.POST
         paperId = offset[-20:]

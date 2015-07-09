@@ -41,9 +41,11 @@ def SelectQuestion(ChL,ChH,Type_i,Num,Diff,request):  # used to select question 
         mysum +=NumQ
 
         UserClassId = get_class(request).OnAuthClassId
-        courseInfo = Class_info.objects.get(class_id=UserClassId).id
+        courseInfo = Class_info.objects.get(id=UserClassId).course
         courseId = courseInfo.id
+
         Q = Question.objects.filter(Chapter__in=range(ChL,ChH+1), Type__in=Type_i, Difficulty=i,CourseId=courseId)
+
         #SelectQue
         if len(Q)<NumQ:
             return []
@@ -59,9 +61,17 @@ def SelectQuestion(ChL,ChH,Type_i,Num,Diff,request):  # used to select question 
             SelectQue.append(Q[i])
     return SelectQue
 #After generate paper, adjust some of questions.
+@login_required
 def PaperAdjust(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
+
+    groups = request.user.groups.values_list('name', flat=True);
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if request.POST:
         QuestionNum = 0
         try:
@@ -87,10 +97,16 @@ def PaperAdjust(request,offset):
         pagename='Paper Manual Generate'
         return render_to_response('P_manual.html',locals(),context_instance=RequestContext(request))
 #This view is used to generate paper automatically
+@login_required
 def PaperAutoGenerate(request):
     # here we need user_auth
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login/')
+    groups = request.user.groups.values_list('name', flat=True);
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
     errors = []
     if request.POST:
         cd = request.POST
@@ -165,9 +181,16 @@ def PaperAutoGenerate(request):
         return render_to_response('P_view_tea.html', {'QuestionList': mylist,'Paper':paper,'Full':full},context_instance=RequestContext(request))
     return render_to_response('P_auto.html', {'errors': errors},context_instance=RequestContext(request))
 #After generate paper, teacher choose cancel
+
+@login_required
 def PaperD(request,offset):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect('/');
+        return HttpResponseRedirect('/')
+    groups = request.user.groups.values_list('name', flat=True);
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
     if request.POST:
         errors = []
         try:
@@ -178,9 +201,16 @@ def PaperD(request,offset):
         # return render_to_response('P_auto.html', {'errors': errors},context_instance=RequestContext(request))
         return HttpResponseRedirect('/teacher/AutoGenerate/')
 # generate paper manually---search with given condition
+@login_required
 def PaperManualGenerate(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     QuestionList = []
     PaperId = offset
     if len(offset) == 20:
@@ -225,9 +255,17 @@ def PaperManualGenerate(request,offset):
             QuestionList = Question.objects.filter(Chapter__in=range(chL,chU+1),Type__in=type_i,Stem__icontains=keyword,Difficulty__in=range(dfl,dfu+1),Flag=1)
     return render_to_response('P_manual.html',locals(),context_instance=RequestContext(request))
 #Generate paper manually--generate paper according to user's selection
+@login_required
 def PaperMaG(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if request.POST:
         errors = ''
         form = request.POST
@@ -296,9 +334,17 @@ def PaperMaG(request,offset):
                     )
     return HttpResponse('You\'ve sucessfully genreate a paper!<br><a href="/teacher/ManualGenerate/">Return to Manual generate page or do another</a>')
 # generate a analysis with specific paper
+@login_required
 def PaperA(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if not request.POST:
         pagename = 'Paper Name'
         try:
@@ -345,24 +391,41 @@ def PaperA(request,offset):
                 ErrorName.append(name)
         return render_to_response('P_Analy_t.html',locals(),context_instance=RequestContext(request))
 # show all of paper need to be analysed
+@login_required
 def PaperAnalysis(request):
     #this view generate PapeAnalysis with ID (get from url)
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if not request.POST:
         # get score
         pagename = 'PaperAnalysis'
         teacher = request.user.username
-        paper= Paper.objects.filter(Creator = teacher,ClassId='0000000001')
+        UserClassId = get_class(request).OnAuthClassId
+        paper= Paper.objects.filter(Creator = teacher,ClassId=UserClassId)
         PaperList =[]
         for paperItem in  paper:
             URL = '/teacher/Analysis/'+paperItem.PaperId+'/'
             PaperList.append({'PaperName':paperItem.PaperName,'URL':URL})
         return render_to_response('P_Analy.html',locals(),context_instance=RequestContext(request))
 # search and show result
+@login_required
 def QuestionModify(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/user_auth/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     QuestionList = []
     if request.method == 'POST':
         form = request.POST
@@ -400,9 +463,17 @@ def QuestionModify(request):
             QuestionList = Question.objects.filter(Chapter__in=range(chL,chU+1),Type__in=type_i,Stem__icontains=keyword,Difficulty__in=range(dfl,dfu+1),Flag=1)
     return render_to_response('Q_mod.html',{'pagename':'modify question','QuestionList':QuestionList},context_instance=RequestContext(request))
 #modify question in database
+@login_required
 def QuestionM(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/user_auth/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if request.POST:
         QuestionName = Question.objects.filter(QuestionId=offset)
         if not QuestionName:
@@ -433,9 +504,17 @@ def QuestionM(request,offset):
         page = 'Modify successfully!<br><a href="/teacher/ModifyQuestion/">Return to Modify or another</a>'
         return HttpResponse(page)
 #delete selected question in database(actually not really delete, set flag=0)
+@login_required
 def QuestionD(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if request.POST:
         x = '<a href = "/teacher/DeleteQuestion/">Return to Deltete</a>'
         try:
@@ -446,9 +525,17 @@ def QuestionD(request,offset):
             page = 'Question Does Not Exist!<br>'+x
             return HttpResponse(page)
 #search question and show result to delete
+@login_required
 def QuestionDelete(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     QuestionList = []
     if request.method == 'POST':
         form = request.POST
@@ -486,16 +573,32 @@ def QuestionDelete(request):
             QuestionList = Question.objects.filter(Chapter__in=range(chL,chU+1),Type__in=type_i,Stem__icontains=keyword,Difficulty__in=range(dfl,dfu+1),Flag=1)
     return render_to_response('Q_del.html',{'pagename':'modify question','QuestionList':QuestionList},context_instance=RequestContext(request))
 #show a page to add different kind of question
+@login_required
 def QuestionAdd(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if not request.POST:
         #return  HttpResponse('hello')
         return render_to_response('Q_add.html',{'pagename':'Add Questions'},context_instance=RequestContext(request))
 # add select question
+@login_required
 def QuestionAddForm1(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if request.POST:
         form = request.POST
         sOptionA = form['SOptionA']
@@ -525,6 +628,9 @@ def QuestionAddForm1(request):
         questionId = re.sub(r'[-:\\.\\ ]','',str(datetime.datetime.now()))
         length = len(str(request.user.username))
         questionId = request.user.username + questionId[0:(20-length)]
+        UserClassId = get_class(request).OnAuthClassId
+        courseInfo = Class_info.objects.get(id=UserClassId).course
+        courseId = courseInfo.id
         Question.objects.create(QuestionId =questionId,
                                 Stem = stem,
                                 OptionA = sOptionA,
@@ -536,16 +642,24 @@ def QuestionAddForm1(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = get_class(request),
+                                CourseId = courseId,
                                 Score = score,
             )
         x = '<a href = "/teacher/AddQuestion/">Return to Add</a>'
         page =  'create successfully<br>'+x
         return HttpResponse(page)
 #add judge question
+@login_required
 def QuestionAddForm2(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if request.POST:
         #course = # you need to get the id of the curerent user
         form = request.POST
@@ -571,6 +685,9 @@ def QuestionAddForm2(request):
         questionId = re.sub(r'[-:\\.\\ ]','',str(datetime.datetime.now()))
         length = len(str(request.user.username))
         questionId = request.user.username + questionId[0:(20-length)]
+        UserClassId = get_class(request).OnAuthClassId
+        courseInfo = Class_info.objects.get(id=UserClassId).course
+        courseId = courseInfo.id
         Question.objects.create(QuestionId =questionId,
                                 Stem = stem,
              #                   OptionA = sOptionA,
@@ -582,13 +699,14 @@ def QuestionAddForm2(request):
                                 Flag = flag,
                                 Answer = str(answer),
                                 Chapter = chapter,
-                                CourseId = get_class(request),
+                                CourseId = courseId,
                                 Score = score,
             )
         x = '<a href = "/teacher/AddQuestion/">Return to Add</a>'
         page =  'create successfully<br>'+x
         return HttpResponse(page)
 #function used to generate a question list of a paper
+
 def getpaper(PaperList):
     paper = []
     for papername in PaperList:
@@ -618,14 +736,25 @@ def getpaper(PaperList):
         paper.append({'PaperId':PaperId,'IsEnd':IsEnd,'IsStart':IsStart,'PaperName':PaperName})
     return paper
 #used to set start time or deadline as now
+@login_required
 def PaperManagement(request,offset):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
+
+    groups = request.user.groups.values_list('name', flat=True)
+    if len(groups) > 0:
+        Type = groups[0]
+    if Type != 'teacher':
+        raise Http404()
+
     if not request.POST:
         # get score
         pagename = 'Paper Management'
         teacher = request.user.username
-        PaperList= Paper.objects.filter(Creator = teacher,ClassId='0000000001')
+        UserClassId = get_class(request).OnAuthClassId
+        courseInfo = Class_info.objects.get(id=UserClassId).course
+        courseId = courseInfo.id
+        PaperList= Paper.objects.filter(Creator = teacher,ClassId=UserClassId)
         PaperList = getpaper(PaperList)
         return render_to_response('P_manage.html',locals(),context_instance=RequestContext(request))
         return render_to_response('P_manage.html',locals(),context_instance=RequestContext(request))
@@ -648,11 +777,14 @@ def PaperManagement(request,offset):
             paper.Deadline = now
         paper.save()
         teacher = request.user.username
-        PaperList= Paper.objects.filter(Creator = teacher,ClassId='0000000001')
+        UserClassId = get_class(request).OnAuthClassId
+        courseInfo = Class_info.objects.get(id=UserClassId).course
+        courseId = courseInfo.id
+        PaperList= Paper.objects.filter(Creator = teacher,ClassId=UserClassId)
         PaperList = getpaper(PaperList)
         return render_to_response('P_manage.html',locals(),context_instance=RequestContext(request))
 
-'''
+
 def newf(request):
     for i  in range(20):
         questionId = re.sub(r'[-:\\.\\ ]','',str(datetime.datetime.now()))
@@ -678,7 +810,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '00000001',
+                                CourseId = '06188210',
                                 Score = score,
             )
     for i  in range(20):
@@ -705,7 +837,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '00000001',
+                                CourseId = '06188210',
                                 Score = score,
             )
     for i  in range(20):
@@ -732,7 +864,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '00000001',
+                                CourseId = '06188210',
                                 Score = score,
             )
     for i  in range(20):
@@ -751,7 +883,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '00000001',
+                                CourseId = '06188210',
                                 Score = score,
             )
     for i  in range(20):
@@ -771,8 +903,7 @@ def newf(request):
                                 Flag = flag,
                                 Answer = answer,
                                 Chapter = chapter,
-                                CourseId = '00000001',
+                                CourseId = '06188210',
                                 Score = score,
             )
     return HttpResponse('why should i return ?')
-'''
