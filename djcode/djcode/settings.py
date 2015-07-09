@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'teacher', #OnlineTest
     'student', #OnlineTest
     'RMS',
+    'ACS',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -64,9 +65,10 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
-                 os.path.join(os.path.dirname(__file__), '../teacher/template').replace('\\','/'),
                  os.path.join(os.path.dirname(__file__), '../RMS/templates').replace('\\','/'),
+                 os.path.join(os.path.dirname(__file__), '../ACS/templates').replace('\\','/'),
                  os.path.join(os.path.dirname(__file__), '../templates').replace('\\','/'),
+                 os.path.join(os.path.dirname(__file__), '../teacher/template').replace('\\','/'),
                  ],
         'APP_DIRS': True,
         'OPTIONS': {
