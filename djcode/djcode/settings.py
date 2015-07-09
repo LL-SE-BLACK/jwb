@@ -42,8 +42,8 @@ INSTALLED_APPS = (
     'IMS',
     'dbtest',
     'classChoose',
-    #'teacher',
-    #'student',
+    'teacher', #OnlineTest
+    'student', #OnlineTest
 )
 
 MIDDLEWARE_CLASSES = (

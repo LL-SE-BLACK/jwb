@@ -22,12 +22,12 @@ from djcode import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns #by SMS
 
 urlpatterns = [
+    url(r'^$', startup),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ims/', include('IMS.urls')),
     url(r'^SM/', include('dbtest.urls')), #by SMS
     url(r'^', include('classChoose.urls')),
-    url(r'^$', startup),
-    #url(r'^', include('teacher.url')), #by OnlineTest
+    url(r'^', include('teacher.url')), #by OnlineTest
 ]
 
 urlpatterns += staticfiles_urlpatterns() #by SMS
