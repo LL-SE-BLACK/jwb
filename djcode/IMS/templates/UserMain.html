@@ -1,0 +1,132 @@
+<!-- #by henry -->
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>User Management</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+</head>
+<body>
+<br/>
+
+<div class="container">
+    <nav class="navbar" role="navigation">
+        <div>
+            <ul class="nav nav-tabs navbar-left">
+                <li role="presentation"><a href="/ims/home/">个人首页</a></li>
+                <li role="presentation"><a href="/ims/course/">课程信息管理</a></li>
+                <li role="presentation" class="active"><a href="#">用户信息管理</a></li>
+                <li role="presentation"><a href="/ims/home/profile/">个人信息管理</a></li>
+                <li role="presentation"><a href="/ims/log/">系统日志管理</a></li>
+                <li role="presentation"><a href="/ims/logout/">退出登录</a></li>
+            </ul>
+            <ul class="nav navbar-right">
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Choose operation</h1>
+    </div>
+    <br/>
+    <ul class="nav nav-pills nav-stacked">
+        {% if canManageFaculty %}
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('addfaculty')">AddFaculty</a>
+        </li>
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('modfaculty')">ModifyFaculty</a>
+        </li>
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('delfaculty')">DeleteFaculty</a>
+        </li>
+        {% endif %}
+        {% if canManageStudent %}
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('addstudent')">AddStudent</a>
+        </li>
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('modstudent')">ModifyStudent</a>
+        </li>
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('delstudent')">DeleteStudent</a>
+        </li>
+        {% endif %}
+        {% if canManageAdmin %}
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('addadmin')">AddAdmin</a>
+        </li>
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('modadmin')">ModifyAdmin</a>
+        </li>
+        <li role="presentation">
+            <a href="#" onclick="javascript:f('deladmin')">DeleteAdmin</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+
+<!-- hidden form area begin -->
+<form id="addfaculty" action="/ims/user/add_faculty/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="AddFaculty">
+    <input type="hidden" name="first">
+</form>
+<form id="addstudent" action="/ims/user/add_student/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="AddStudent">
+    <input type="hidden" name="first">
+</form>
+<form id="addadmin" action="/ims/user/add_admin/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="AddAdmin">
+    <input type="hidden" name="first">
+</form>
+
+<form id="modfaculty" action="/ims/user/modify_faculty/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="ModifyFaculty">
+    <input type="hidden" name="first">
+</form>
+<form id="modstudent" action="/ims/user/modify_student/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="ModifyStudent">
+    <input type="hidden" name="first">
+</form>
+<form id="modadmin" action="/ims/user/modify_admin/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="ModifyAdmin">
+    <input type="hidden" name="first">
+</form>
+
+<form id="delfaculty" action="/ims/user/delete_faculty/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="DeleteFaculty">
+    <input type="hidden" name="first">
+</form>
+<form id="delstudent" action="/ims/user/delete_student/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="DeleteStudent">
+    <input type="hidden" name="first">
+</form>
+<form id="deladmin" action="/ims/user/delete_admin/" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="DeleteAdmin">
+    <input type="hidden" name="first">
+</form>
+<!-- hidden form area end -->
+
+</body>
+</html>
+
+<script type="text/javascript">
+    function f(a) {
+        var form = document.getElementById(a);
+        form.first.value = 1;
+        form.submit();
+    }
+</script>

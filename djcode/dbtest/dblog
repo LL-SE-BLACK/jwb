@@ -1,0 +1,126 @@
+#####
+# 	This is the database log when creating the database and tables
+#
+# 	Add comments here if any changes took place relevent to the database
+#####
+
+
+
+
+from IMS.models import Student_user
+from IMS.models import Faculty_user
+from IMS.models import Course_info
+from IMS.models import Class_info
+from IMS.models import Class_table
+from dbtest.models import ScoreTable
+from dbtest.models import TempTable
+from dbtest import views
+from dbtest import xls_utils
+
+
+
+stu1 = Student_user.objects.get(id='3120185796')
+stu2 = Student_user.objects.get(id='3120366069')
+stu3 = Student_user.objects.get(id='3120615710')
+stu4 = Student_user.objects.get(id='3120817468')
+
+fac1 = Faculty_user.objects.get(id='222222')
+fac2 = Faculty_user.objects.get(id='222223')
+fac3 = Faculty_user.objects.get(id='222224')
+
+cour1 = Course_info.objects.get(id='06188210')
+cour2 = Course_info.objects.get(id='04122600')
+cour4 = Course_info.objects.get(id='04124320')
+cour3 = Course_info.objects.get(id='06188051')
+
+
+### Update class_info fake data
+cla1 = Class_info.objects.create(id='0000000001', course=cour1, teacher=fac1, time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cla2 = Class_info.objects.create(id='0000000002', course=cour2, teacher=fac1, time='1', room='105', examdate='160405', examtime='120', examroom='103', capacity='50')
+
+cla3 = Class_info.objects.create(id='0000000003', course=cour3, teacher=fac1, time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cla4 = Class_info.objects.create(id='0000000004', course=cour4, teacher=fac1, time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cla5 = Class_info.objects.create(id='0000000005', course=cour4, teacher=fac2, time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cla6 = Class_info.objects.create(id='0000000006', course=cour4, teacher=fac3, time='5', room='205', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cla1 = Class_info.objects.get(id='0000000001')
+cla2 = Class_info.objects.get(id='0000000002')
+cla3 = Class_info.objects.get(id='0000000003')
+cla4 = Class_info.objects.get(id='0000000004')
+cla5 = Class_info.objects.get(id='0000000005')
+cla6 = Class_info.objects.get(id='0000000006')
+
+
+### Update class_table
+#### class1			已出分
+
+class_tuple11 = Class_table.objects.create(id='0000000001', student=stu1, Class=cla1)
+class_tuple12 = Class_table.objects.create(id='0000000002', student=stu2, Class=cla1)
+class_tuple13 = Class_table.objects.create(id='0000000003', student=stu3, Class=cla1)
+class_tuple14 = Class_table.objects.create(id='0000000004', student=stu4, Class=cla1)
+
+
+#### class2  		上传未确认
+
+class_tuple21 = Class_table.objects.create(id='0000000005', student=stu1, Class=cla2)
+class_tuple22 = Class_table.objects.create(id='0000000006', student=stu2, Class=cla2)
+class_tuple23 = Class_table.objects.create(id='0000000007', student=stu3, Class=cla2)
+class_tuple24 = Class_table.objects.create(id='0000000008', student=stu4, Class=cla2)
+
+#### class3			已出分
+
+class_tuple31 = Class_table.objects.create(id='0000000009', student=stu1, Class=cla3)
+class_tuple32 = Class_table.objects.create(id='00000000010', student=stu2, Class=cla3)
+
+#### class4			未上传
+
+class_tuple43 = Class_table.objects.create(id='0000000011', student=stu3, Class=cla4)
+class_tuple44 = Class_table.objects.create(id='0000000012', student=stu4, Class=cla4)
+
+#### class5			已出分		
+
+class_tuple53 = Class_table.objects.create(id='0000000013', student=stu3, Class=cla5)
+class_tuple54 = Class_table.objects.create(id='0000000014', student=stu4, Class=cla5)
+
+#### class6			未上传
+
+class_tuple61 = Class_table.objects.create(id='0000000015', student=stu1, Class=cla6)
+class_tuple62 = Class_table.objects.create(id='0000000016', student=stu2, Class=cla6)
+
+
+### Update ScoreTable 
+
+sco = ScoreTable.objects.create(class_id=cla1, student_id=stu1, score=99.5)
+sco = ScoreTable.objects.create(class_id=cla1, student_id=stu2, score=90.5)
+sco = ScoreTable.objects.create(class_id=cla1, student_id=stu3, score=85.5)
+sco = ScoreTable.objects.create(class_id=cla1, student_id=stu4, score=60.5)
+
+sco = ScoreTable.objects.create(class_id=cla3, student_id=stu1, score=88.5)
+sco = ScoreTable.objects.create(class_id=cla3, student_id=stu2, score=94.5)
+
+sco = ScoreTable.objects.create(class_id=cla5, student_id=stu3, score=60.5)
+sco = ScoreTable.objects.create(class_id=cla5, student_id=stu4, score=77.5)
+
+
+### Update TempTable with class 2
+
+
+sco = TempTable.objects.create(class_id=cla2, student_id=stu1, score=88.5)
+sco = TempTable.objects.create(class_id=cla2, student_id=stu2, score=77.5)
+sco = TempTable.objects.create(class_id=cla2, student_id=stu3, score=66.5)
+sco = TempTable.objects.create(class_id=cla2, student_id=stu4, score=99.5)
+
+
+l = views.b_score_modification('0000000001', '3120185796', 88.5, '123')
+l = views.b_score_modification('0000000001', '3120366069', 0, u'考试作弊了')
+
+l = views.db_query_modify_info('000002')
+
+l = views.ScoreTable.objects.filter(class_id='0000000001', student_id='3120185796').first()
+l = views.db_query_modify_info('000002')
+l = views.b_score_modification('0000000005', '3120615710', 60.5, u'原因是什么我也不知道') 
+l = views.b_score_modification('0000000005', '3120817468', 100, u'成绩改错了') 
