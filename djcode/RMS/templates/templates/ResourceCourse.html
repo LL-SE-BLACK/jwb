@@ -112,6 +112,7 @@
                                         <th>New</th>
                                         <th>Title</th>
                                         <th>Deadline</th>
+                                        <th>Done</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -128,6 +129,7 @@
                                         {% endif %}
                                         <td width="300"> <a href="Homework.html?homework_id={{homework.pk}}&course_id={{course_id}}">{{homework.title}}</a></td>
                                         <td width="200">{{homework.end_date}}</td>
+                                        <td width="30">{{ homework.done }}</td>
                                     </tr>
 
 

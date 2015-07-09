@@ -94,6 +94,8 @@ def resourcecourse(request):
     for i in homework_list:
         if i.id not in view_list:
             NewHomework = True
+        if HomeworkFile.objects.filter(course_id=i.course_id,student_id=request.COOKIES['uid']):
+            i.done = True
     if len(homework_list) > 5:
         homework_list = homework_list[0:5]
     if len(notice_list) > 5:
@@ -457,38 +459,38 @@ def homework_upload(request):
     course_list = getcourselist(request)
     if request.COOKIES['type'] == 'student':
             sid = request.COOKIES['uid']
-    try:
-        f = request.FILES['file']
-        address = r'homework/'+f.name
-        f = handle_uploaded_file(f,address)
-        add = HomeworkFile(
-           homework_num=homework_num,
-            course_id=course_name,
-            student_id = sid,
-            homework_add = address,
-            )
+   # try:
+    f = request.FILES['file']
+    address = r'RMS/resource/'+f.name
+    f = handle_uploaded_file(f,address)
+    add = HomeworkFile(
+       homework_num=homework_num,
+        course_id=course_name,
+        student_id = sid,
+        homework_add = address,
+        )
 
-        add.save()
-        print 'yyy'
-        homeworkfile_list = HomeworkFile.objects.filter(course_id=course_name)
-        context = RequestContext(request, {
-        'succ': 'yes',
-        'course_id':course_name,
-        'course_list':course_list,
-        'homeworkfile_list':homeworkfile_list,
-        })
-        
-        Ex.objects.filter(Q(student_id=sid) & Q(pk=homework_num)).update(is_done=True)
-        return HttpResponse(templates.render(context))
-    except:
-        homeworkfile_list = HomeworkFile.objects.filter(course_id=course_name)
-        context = RequestContext(request, {
-        'succ': 'no',
-        'course_id':course_name,
-        'course_list':course_list,
-        'homeworkfile_list':homeworkfile_list,
-        })
-        return HttpResponse(templates.render(context))
+    add.save()
+    print 'yyy'
+    homeworkfile_list = HomeworkFile.objects.filter(course_id=course_name)
+    context = RequestContext(request, {
+    'succ': 'yes',
+    'course_id':course_name,
+    'course_list':course_list,
+    'homeworkfile_list':homeworkfile_list,
+    })
+
+    Ex.objects.filter(Q(student_id=sid) & Q(pk=homework_num)).update(is_done=True)
+    return HttpResponse(templates.render(context))
+    # except:
+    #     homeworkfile_list = HomeworkFile.objects.filter(course_id=course_name)
+    #     context = RequestContext(request, {
+    #     'succ': 'no',
+    #     'course_id':course_name,
+    #     'course_list':course_list,
+    #     'homeworkfile_list':homeworkfile_list,
+    #     })
+    #     return HttpResponse(templates.render(context))
 
 def gethomework_list(request):
     templates=loader.get_template('templates/DownloadHomework.html')
