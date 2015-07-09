@@ -13,6 +13,7 @@ from django.template import Template
 from django.http import HttpResponseRedirect
 from django.template.context_processors import csrf
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 from django.contrib.auth import login
@@ -124,6 +125,7 @@ def b_student_query(request):
                                         credit, score, gradePoint}
     """
     return HttpResponse(json.dumps(db_student_query(request.user.username)), content_type="application/json")
+
 
 def db_student_query(username):
     """
@@ -367,6 +369,7 @@ class ModifyForm(forms.Form):
     newScore = forms.DateField()
     modifyReason = forms.DateField()
 
+
 @csrf_exempt
 def B_score_modification(request, c_id, s_id):
     print("B_score_modification")
@@ -407,7 +410,7 @@ def b_score_modification(c_id, s_id, score, reason):
     # chief_faculty = cla.id.chief_faculty  # generate a new message
     # update_message = MessageTable.objects.create(from_faculty_id=from_fac,
     # to_faculty_id=chief_faculty,
-    # 											 student_id=stu, class_id=cla,
+    # student_id=stu, class_id=cla,
     # 											 old_score=old_score, new_score=score,
     # 											 reason=reason, status=0)
 
@@ -638,7 +641,7 @@ def save_new_mod_score(message_id):
 
 # def b_sanction_result(request, msg_id):
 # """
-#     To update the message status, usually making it True
+# To update the message status, usually making it True
 #     :param msg_id: messageID in the MessageTable
 #     :return: if_succeeded as an HttpResponse object
 #     """
