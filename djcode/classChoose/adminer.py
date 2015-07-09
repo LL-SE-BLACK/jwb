@@ -192,179 +192,183 @@ def sift(Time,classes_list,admin_college):
 #@login_required
 def  admin_index(request):
     #forcelogout(request)
+    try:
+        admin_id = request.GET['id']
 
-    admin_id = request.GET['id']
+        if admin_id=="2":
+            print ("if")
+            return HttpResponse("permission denied!")
 
-    if admin_id=="2":
-        print ("if")
-        return HttpResponse("permission denied!")
-
-    print ("id:"+admin_id)
-    admin = Admin_user.objects.get(id=admin_id)#the currently loggedin user
-    a=False
-    if a:
-        #if admin.is_authenticated() == False:
-        return render(
-            request,
-            "login.html"
-        )
-    else:
-        admin_college = admin.college
-        #Course_info = Course_info.objects.filter(college=admin_college)
-        classes_list = Class_info.objects.filter(course__college=admin_college).order_by('-course__id')#本学院的所有课
-        #sorted(classes_list)
-        #for every class in classes_list
-        #class.remian=class.capacity-(Class_table.objects.filter(id=class.id).count())
-        #print(classes_list)
-        for Class in classes_list:
-            qset = (Q(Class__id = Class.id)&Q(status = 1))
-            Class.remain = Class.capacity - (Class_table.objects.filter(qset).count())
-        #print (classes_list)
-        if request.method=='GET':
+        print ("id:"+admin_id)
+        admin = Admin_user.objects.get(id=admin_id)#the currently loggedin user
+        a=False
+        if a:
+            #if admin.is_authenticated() == False:
             return render(
                 request,
-                "adminpage1.html",
-                {'classes':classes_list, 'admin':admin},
+                "login.html"
             )
-
         else:
-            ch_time=choose_time(id="1",	start_time =request.POST.get('start_time') ,end_time =request.POST.get('sift_time') ,buXuan_start_time =request.POST.get('buxuan_time') ,buXuan_end_time = request.POST.get('end_buxuan_time'))
-            ch_time.save()
-            print (choose_time.objects.all())
-            Time = request.POST.get('sift_time')
-            time.end_time = Time
-            print (Time)
-            Time_=datetime.datetime.now()
-            Time_= datetime.datetime.strptime(Time,"%Y-%m-%d %H:%M:%S")
-            #time = datetime.datetime.strptime(Time,"%Y-%m-%d %H:%M:%S").datetime()
-            print(Time_)
-            thread1=threading.Thread(target=sift,name="sifter",args=(Time_,classes_list,admin_college))
-            thread1.start()
-            return render(
-                request,
-                "adminpage1.html",
-                {'classes':classes_list, 'admin':admin},
-            )
+            admin_college = admin.college
+            #Course_info = Course_info.objects.filter(college=admin_college)
+            classes_list = Class_info.objects.filter(course__college=admin_college).order_by('-course__id')#本学院的所有课
+            #sorted(classes_list)
+            #for every class in classes_list
+            #class.remian=class.capacity-(Class_table.objects.filter(id=class.id).count())
+            #print(classes_list)
+            for Class in classes_list:
+                qset = (Q(Class__id = Class.id)&Q(status = 1))
+                Class.remain = Class.capacity - (Class_table.objects.filter(qset).count())
+            #print (classes_list)
+            if request.method=='GET':
+                return render(
+                    request,
+                    "adminpage1.html",
+                    {'classes':classes_list, 'admin':admin},
+                )
 
+            else:
+                ch_time=choose_time(id="1",	start_time =request.POST.get('start_time') ,end_time =request.POST.get('sift_time') ,buXuan_start_time =request.POST.get('buxuan_time') ,buXuan_end_time = request.POST.get('end_buxuan_time'))
+                ch_time.save()
+                print (choose_time.objects.all())
+                Time = request.POST.get('sift_time')
+                time.end_time = Time
+                print (Time)
+                Time_=datetime.datetime.now()
+                Time_= datetime.datetime.strptime(Time,"%Y-%m-%d %H:%M:%S")
+                #time = datetime.datetime.strptime(Time,"%Y-%m-%d %H:%M:%S").datetime()
+                print(Time_)
+                thread1=threading.Thread(target=sift,name="sifter",args=(Time_,classes_list,admin_college))
+                thread1.start()
+                return render(
+                    request,
+                    "adminpage1.html",
+                    {'classes':classes_list, 'admin':admin},
+                )
+    except:
+        return HttpResponse("permission denied!")
 
 
 #@login_required
 def  admin_page2(request):
-    #forcelogout(request)
-    class_ID = request.GET.get('class_id')
-    #print (students_list)
-    #print (students_id_list)
-    if request.method == 'GET':
-        #class_ID = request.GET.get('class_id')
-        print (class_ID)
-        a=""
-        (students_list,students_id_list) = select_students_list(class_ID)
-        return render(
-            request,
-            "adminpage2.html",
-            {'students':students_list,'List':students_id_list,'flag':a}
-        )
-    else :
-        print ("in POST")
-        #class_ID = request.POST.get('class_id_for_del')
-        #students_ID_list = list()
-        #student_ID_list = (request.POST.get('hiddenInput')).split('A')
-        #print (class_ID)
-        #print (student_ID_list)
-        Tag = request.POST.get('tag')
-        print (Tag)
-        if Tag == "1":
-            print ("haha")
-            #class_ID = request.POST.get('class_id_hidden')
-            student_ID = request.POST.get('add_id')
-            print (student_ID)
-            #add_done(Request)
-            flag=add_done(class_ID,student_ID)
+    try:
+        #forcelogout(request)
+        class_ID = request.GET.get('class_id')
+        #print (students_list)
+        #print (students_id_list)
+        if request.method == 'GET':
+            #class_ID = request.GET.get('class_id')
+            print (class_ID)
+            a=""
             (students_list,students_id_list) = select_students_list(class_ID)
             return render(
                 request,
                 "adminpage2.html",
-                {'students':students_list,'List':students_id_list,'flag2':flag}
+                {'students':students_list,'List':students_id_list,'flag':a}
             )
-        else:
-            student_IDs = request.POST.get('hiddenInput')
-            students_ID_list=list()
-            if(student_IDs):
-                students_ID_list = student_IDs.split('A')
-            print ("class_ID:"+class_ID)
-            print (students_ID_list)
-            flag=delete_done(class_ID,students_ID_list)
-            (students_list,students_id_list) = select_students_list(class_ID)
-            return render(
-                request,
-                "adminpage2.html",
-                {'students':students_list,'List':students_id_list,'flag':flag}
-            )
+        else :
+            print ("in POST")
+            #class_ID = request.POST.get('class_id_for_del')
+            #students_ID_list = list()
+            #student_ID_list = (request.POST.get('hiddenInput')).split('A')
+            #print (class_ID)
+            #print (student_ID_list)
+            Tag = request.POST.get('tag')
+            print (Tag)
+            if Tag == "1":
+                print ("haha")
+                #class_ID = request.POST.get('class_id_hidden')
+                student_ID = request.POST.get('add_id')
+                print (student_ID)
+                #add_done(Request)
+                flag=add_done(class_ID,student_ID)
+                (students_list,students_id_list) = select_students_list(class_ID)
+                return render(
+                    request,
+                    "adminpage2.html",
+                    {'students':students_list,'List':students_id_list,'flag2':flag}
+                )
+            else:
+                student_IDs = request.POST.get('hiddenInput')
+                students_ID_list=list()
+                if(student_IDs):
+                    students_ID_list = student_IDs.split('A')
+                print ("class_ID:"+class_ID)
+                print (students_ID_list)
+                flag=delete_done(class_ID,students_ID_list)
+                (students_list,students_id_list) = select_students_list(class_ID)
+                return render(
+                    request,
+                    "adminpage2.html",
+                    {'students':students_list,'List':students_id_list,'flag':flag}
+                )
+    except:
+        return HttpResponse("permission denied!")
 
 
 
 #@login_required
 def buXuan(request):
-    #forcelogout(request)
-    print ("buXuan")
-    class_ID = request.GET.get('class_id')
-    Class=Class_info.objects.get(id=class_ID)
-    cid=class_ID
-    cname =Class.course.name
+    try:
+        #forcelogout(request)
+        print ("buXuan")
+        class_ID = request.GET.get('class_id')
+        Class=Class_info.objects.get(id=class_ID)
+        cid=class_ID
+        cname =Class.course.name
 
-    print (class_ID)
-    #class_ID = request.GET.get('class_id')
-    #print (students_list)
-    #print (students_id_list)
-    if request.method == 'GET':
-        #class_ID = request.GET.get('class_id')
         print (class_ID)
-        a=""
-        buXuan_list = buXuan_info.objects.filter(Class__id = class_ID).order_by('student__id')
-        print (buXuan_info.objects.all())
-        #(students_list,students_id_list) = select_students_list(class_ID)
-        students_id_list=list()
-        for buXuan in buXuan_list:
-            students_id_list.append(buXuan.student.id)
+        #class_ID = request.GET.get('class_id')
+        #print (students_list)
+        #print (students_id_list)
+        if request.method == 'GET':
+            #class_ID = request.GET.get('class_id')
+            print (class_ID)
+            a=""
+            buXuan_list = buXuan_info.objects.filter(Class__id = class_ID).order_by('student__id')
+            print (buXuan_info.objects.all())
+            #(students_list,students_id_list) = select_students_list(class_ID)
+            students_id_list=list()
+            for buXuan in buXuan_list:
+                students_id_list.append(buXuan.student.id)
 
-        return render(
-            request,
-            "bySelect.html",
-            {'buXuan':buXuan_list,'List':students_id_list,'cid':cid,'cname':cname}
-        )
-    else :                                          #补选添加
-        print ("in POST")
-        #class_ID = request.POST.get('class_id_for_del')
-        #students_ID_list = list()
-        #student_ID_list = (request.POST.get('hiddenInput')).split('A')
-        #print (class_ID)
-        #print (student_ID_list)
+            return render(
+                request,
+                "bySelect.html",
+                {'buXuan':buXuan_list,'List':students_id_list,'cid':cid,'cname':cname}
+            )
+        else :                                          #补选添加
+            print ("in POST")
+            #class_ID = request.POST.get('class_id_for_del')
+            #students_ID_list = list()
+            #student_ID_list = (request.POST.get('hiddenInput')).split('A')
+            #print (class_ID)
+            #print (student_ID_list)
 
-        print ("haha")
-        #class_ID = request.POST.get('class_id_hidden')
-        student_ID = request.POST.get('add_id')[:-1]
-        print ("student_ID:")
-        print (student_ID)
-        #add_done(Request)
-        flag=add_done(class_ID,student_ID)
-        print ("flag:")
-        print (flag)
-
-
-        qset = (Q(Class__id = class_ID)&Q(student__id = student_ID))
-        buXuan1=buXuan_info.objects.get(qset)
-        buXuan1.delete()
-        #(students_list,students_id_list) = select_students_list(class_ID)
-        buXuan_list = buXuan_info.objects.filter(Class__id = class_ID).order_by('student__id')
-        students_id_list=list()
-        for buXuan in buXuan_list:
-            students_id_list.append(buXuan.student.id)
-
-        return render(
-            request,
-            "bySelect.html",
-            {'buXuan':buXuan_list,'List':students_id_list,'cid':cid,'cname':cname}
-        )
+            print ("haha")
+            #class_ID = request.POST.get('class_id_hidden')
+            student_ID = request.POST.get('add_id')[:-1]
+            print ("student_ID:")
+            print (student_ID)
+            #add_done(Request)
+            flag=add_done(class_ID,student_ID)
+            print ("flag:")
+            print (flag)
 
 
+            qset = (Q(Class__id = class_ID)&Q(student__id = student_ID))
+            buXuan1=buXuan_info.objects.get(qset)
+            buXuan1.delete()
+            #(students_list,students_id_list) = select_students_list(class_ID)
+            buXuan_list = buXuan_info.objects.filter(Class__id = class_ID).order_by('student__id')
+            students_id_list=list()
+            for buXuan in buXuan_list:
+                students_id_list.append(buXuan.student.id)
 
+            return render(
+                request,
+                "bySelect.html",
+                {'buXuan':buXuan_list,'List':students_id_list,'cid':cid,'cname':cname}
+            )
+    except:
+        return HttpResponse("permission denied!")
