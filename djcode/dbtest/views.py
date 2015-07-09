@@ -18,6 +18,7 @@ from django.contrib.auth import logout
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, Permission
+from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
@@ -366,7 +367,7 @@ class ModifyForm(forms.Form):
     newScore = forms.DateField()
     modifyReason = forms.DateField()
 
-
+@csrf_exempt
 def B_score_modification(request, c_id, s_id):
     print("B_score_modification")
     score = request.POST['newScore']
@@ -751,6 +752,7 @@ import os
 
 
 # get the file uploaded from user
+@csrf_exempt
 def upload_xlsx(request, c_id):
     upload_dir = './upload/'
 
