@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ims/', include('IMS.urls')),
     url(r'^SM/', include('dbtest.urls')), #by SMS
+    url(r'^', include('classChoose.urls')),
     url(r'^$', startup),
     #url(r'^', include('teacher.url')), #by OnlineTest
 ]

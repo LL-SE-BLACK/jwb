@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'skar'
 from IMS.models import *
+from classChoose.models import *
 
 class TempTable(models.Model):
     # faculty_id = models.ForeignKey(Faculty_user)
@@ -57,12 +58,13 @@ class User(models.Model):
     xlsx_file = models.FileField(upload_to='./upload/')
 
 #This class should be get from group of "Choose course"
+"""
 class Scheme_info(models.Model):
-    """
+    '''
     | class_id | id | state |
     |---|---|---|
     | CHARACTER(10) | CHARACTER(8) |  {-2,-1,0,1,2} |
-    """
+    '''
     student_id = models.ForeignKey(Student_user)
     id = models.ForeignKey(Course_info,related_name='scheme_course', primary_key=True)
     state = models.IntegerField(default=0)
@@ -70,3 +72,4 @@ class Scheme_info(models.Model):
         ordering = ["student_id"]
     def __str__(self):
         return (self.id)
+"""

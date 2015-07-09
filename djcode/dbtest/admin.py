@@ -1,3 +1,6 @@
 from django.contrib import admin
+from dbtest.models import *
 
-# Register your models here.
+admin.site.register(ScoreTable)
+admin.site.register(TempTable)
+admin.site.register(MessageTable)

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from django.template import Context, loader
 from django import forms
-from .models import ScoreTable, TempTable, MessageTable, Class_table, Scheme_info
+from .models import ScoreTable, TempTable, MessageTable, Class_table
 import json
 # User Authentication
 from .forms import NameForm
@@ -23,6 +23,7 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from IMS.models import *
+from classChoose.models import *
 ###
 # from dbtest.xls_utils import get_demo_xlsx
 
