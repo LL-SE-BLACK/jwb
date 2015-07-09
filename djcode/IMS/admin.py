@@ -17,9 +17,13 @@ class AdminAdmin(admin.ModelAdmin):
     list_display = ('id', 'contact', 'name', 'gender', 'college')
     search_fields = ('id', )
 
+class ClassInfoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'course', 'teacher' ,'semester', 'year', 'time')
+    search_fields = ('course', 'teacher')
+
 admin.site.register(Student_user, StudentAdmin)
 admin.site.register(Faculty_user, FacultyAdmin)
 admin.site.register(Admin_user, AdminAdmin)
 admin.site.register(Course_info, CourseAdmin)
-admin.site.register(Class_info)
+admin.site.register(Class_info, ClassInfoAdmin)
 admin.site.register(Class_table)
